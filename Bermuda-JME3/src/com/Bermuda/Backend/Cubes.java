@@ -46,8 +46,54 @@ public class Cubes {
 		int x=new Double(vector.getX()).intValue();
 		int y=new Double(vector.getY()).intValue();
 		int z=new Double(vector.getZ()).intValue();
-		create(x,y+2,z,"grass");
+		create(x,y+2,z,"earth");
 	}
+	public static void addResult(Vector3f vector)
+	{
+		int x=new Double(vector.getX()).intValue();
+		int y=new Double(vector.getY()).intValue();
+		int z=new Double(vector.getZ()).intValue();
+		System.out.println(vector.getX());
+		System.out.println(x);
+		System.out.println(Math.ceil(vector.getX()));
+		if(x%2!=0)
+		{
+			if(x>0)
+			{
+				x++;
+			}
+			else
+			{
+				x--;
+			}
+		}
+		
+		if(y%2!=0)
+		{
+			if(y>0)
+			{
+				y++;
+			}
+			else
+			{
+				y--;
+			}
+		}
+		
+		if(z%2!=0)
+		{
+			if(z>0)
+			{
+				z++;
+			}
+			else
+			{
+				z--;
+			}
+		}
+		create(x,y,z,"earth");
+	}
+	
 	public static void addStartCubes()
 	{
 		

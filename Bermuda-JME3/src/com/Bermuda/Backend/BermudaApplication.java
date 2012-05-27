@@ -14,6 +14,7 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 	import com.jme3.material.Material;
 import com.jme3.math.Ray;
+import com.jme3.math.Vector2f;
 	import com.jme3.math.Vector3f;
 	import com.jme3.scene.Geometry;
 	import com.jme3.scene.shape.Box;
@@ -21,6 +22,8 @@ import com.jme3.scene.shape.Sphere;
 	import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Node;
 import com.jme3.texture.Texture;
+import com.jme3.texture.Texture.WrapMode;
+import com.jme3.util.SkyFactory;
 	 
 	/** Sample 2 - How to use nodes as handles to manipulate objects in the scene.
 	 * You can rotate, translate, and scale objects by manipulating their parent nodes.
@@ -40,6 +43,7 @@ import com.jme3.texture.Texture;
 	 
 	    @Override
 	    public void simpleInitApp() {
+	    	flyCam.setMoveSpeed(10);
 	        initCrossHairs(); // a "+" in the middle of the screen to help aiming
 	        initKeys();       // load custom key mappings
 	        initMark();       // a red sphere to mark the hit
@@ -49,7 +53,9 @@ import com.jme3.texture.Texture;
 	        rootNode.attachChild(root);
 	        root.attachChild(cubes); // put this node in the scene
 	        root.attachChild(ground);
-	 
+	        //Add Sky
+	        rootNode.attachChild(SkyFactory.createSky(
+	                assetManager, "Textures/Sky/Bright/FullskiesBlueClear03.dds", false));
 	        /** Attach the two boxes to the *pivot* node. */
 	       addCubes();
 	       makeGround();
@@ -58,20 +64,24 @@ import com.jme3.texture.Texture;
 	    }
 	    protected void makeGround() {
 
-		    Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		    Texture texture= assetManager.loadTexture("Textures/Terrain/splat/grass.jpg");
-		    material.setTexture("ColorMap", texture);
-	    	for(int i=0;i<=100;i+=2)
-	    	{
-	    		for(int i2=-4;i2<=100;i2+=2)
-	    		{
-	    		    Box box = new Box(new Vector3f(50-i, -4, 50-i2), 1, 1, 1);
-	    		    Geometry cube = new Geometry("ground", box);
-	    		    cube.setMaterial(material);
-	    		    ground.attachChild(cube);
-	    		}
-	    	}
-	    }
+   	
+	    	 
+	    		    Box box = new Box(new Vector3f(0, -5, -5), 1000, .2f, 1000);
+	    		    Geometry floor = new Geometry("ground", box);
+	    		    Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+	    		    Texture texture= assetManager.loadTexture("Textures/Terrain/splat/grass.jpg");
+	    		    texture.setWrap(WrapMode.Repeat);
+	    		    box.scaleTextureCoordinates(new Vector2f(1000,1000));
+	    		    mat1.setTexture("ColorMap", texture);
+	    		    floor.setMaterial(mat1);
+	    		    root.attachChild(floor);
+	    	
+	    	
+	    	
+	    	
+	    	
+	    	
+	  }
 	    
 	    
 	    private void initKeys() {
@@ -121,12 +131,23 @@ import com.jme3.texture.Texture;
 		            // 2. Aim the ray from cam loc to cam direction.
 		            Ray ray = new Ray(cam.getLocation(), cam.getDirection());
 		            // 3. Collect intersections between Ray and Shootables in results list.
+		      
 		            root.collideWith(ray, results);
+		           
 		            // 4. Print the results
-		            if(results.size()>0)
+		            
+		            if(results.size()>0 && results.getClosestCollision().getGeometry().getName()!="ground")
 		            {
 		            Cubes.addResult(results.getClosestCollision().getGeometry().getMesh());
 		            }
+		            else if(results.size()>0 && results.getClosestCollision().getGeometry().getName()=="ground")
+		            {
+		            	
+		            	Vector3f pt = results.getClosestCollision().getContactPoint();
+		            	Cubes.addResult(pt);
+		            }
+		            
+		            
 		            /*System.out.println("----- Collisions? " + results.size() + "-----");
 		            for (int i = 0; i < results.size(); i++) {
 		              // For each hit, we know distance, impact point, name of geometry.
